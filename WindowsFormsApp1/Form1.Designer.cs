@@ -71,7 +71,7 @@
             this.somaFatoriais.TabIndex = 3;
             this.somaFatoriais.Text = "Soma Fatoriais";
             this.somaFatoriais.UseVisualStyleBackColor = true;
-            this.somaFatoriais.Click += new System.EventHandler(this.SomaFatoriais_Click);
+            
             // 
             // Form1
             // 
