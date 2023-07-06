@@ -33,6 +33,7 @@
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.hashmat = new System.Windows.Forms.Button();
             this.timeComparissonChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.somaFatoriais = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.timeComparissonChart)).BeginInit();
             this.SuspendLayout();
             // 
@@ -44,7 +45,7 @@
             this.hashmat.TabIndex = 0;
             this.hashmat.Text = "Hashmat";
             this.hashmat.UseVisualStyleBackColor = true;
-            this.hashmat.Click += new System.EventHandler(this.hashmat_Click);
+            this.hashmat.Click += new System.EventHandler(this.Hashmat_Click);
             // 
             // timeComparissonChart
             // 
@@ -62,11 +63,22 @@
             this.timeComparissonChart.TabIndex = 2;
             this.timeComparissonChart.Text = "Time comparisson";
             // 
+            // somaFatoriais
+            // 
+            this.somaFatoriais.Location = new System.Drawing.Point(141, 42);
+            this.somaFatoriais.Name = "somaFatoriais";
+            this.somaFatoriais.Size = new System.Drawing.Size(134, 23);
+            this.somaFatoriais.TabIndex = 3;
+            this.somaFatoriais.Text = "Soma Fatoriais";
+            this.somaFatoriais.UseVisualStyleBackColor = true;
+            this.somaFatoriais.Click += new System.EventHandler(this.SomaFatoriais_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.somaFatoriais);
             this.Controls.Add(this.timeComparissonChart);
             this.Controls.Add(this.hashmat);
             this.Name = "Form1";
@@ -80,6 +92,7 @@
 
         private System.Windows.Forms.Button hashmat;
         private System.Windows.Forms.DataVisualization.Charting.Chart timeComparissonChart;
+        private System.Windows.Forms.Button somaFatoriais;
     }
 }
 
