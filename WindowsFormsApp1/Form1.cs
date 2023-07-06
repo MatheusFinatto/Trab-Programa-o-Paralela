@@ -14,6 +14,35 @@ namespace WindowsFormsApp1
 {
     public partial class Form1 : Form
     {
+       /* void* ThreadExerc1061()
+            {
+                for (int i = 0; i < 25; i++)
+                {
+
+                    int result = abs(entradas[i][0] - entradas[i][1]);
+
+                    resultados[i] = result;
+
+                    printf("THREAD 1: RESOLVED ENTRY #%d (%d - %d) = %d\n", i, entradas[i][0], entradas[i][1], result);
+                }
+            }
+
+            int qtdThreads = [1, 2, 4, 8, 16];
+
+        for (int i = 0; i<qtdThreads.size(); i++) {
+            pthread_t threadsExecutaveis[qtdThreads[i]];
+
+            //startWatch
+
+            for (int j = 0; j<qtdThreads[i]; j++) {
+                pthread_create(&threadsExecutaveis[j], NULL, ThreadExerc1061, NULL);
+        }
+
+        //stopWatch
+        //guarda valor no gráfico
+
+    }*/
+
         public Form1()
         {
             InitializeComponent();
@@ -101,6 +130,7 @@ namespace WindowsFormsApp1
             timeComparissonChart.Titles.Add("Comparison of Elapsed Time");
             timeComparissonChart.ChartAreas[0].AxisX.Title = "Thread Count";
             timeComparissonChart.ChartAreas[0].AxisY.Title = "Elapsed Time (ms)";
+            timeComparissonChart.ChartAreas[0].AxisY.Maximum = 0.05;
 
             // Process each number of threads
             foreach (int threadCount in threadCounts)
