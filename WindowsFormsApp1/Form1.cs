@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Windows.Forms;
@@ -23,21 +24,37 @@ namespace WindowsFormsApp1
         static int presenteIteração = 0;
         static int qtdDeCasosInicial = 0;
         static int qtdDeCasosFinal = 0;
+        static int threadAtual = 0;
+        static List<string> outputResults = new List<string>(); // Armazena os resultados das threads
 
-        void Thread()
+
+        void PopulateInputs()
         {
+            // Populate valores array
+            Random random = new Random();
+            for (int i = 0; i < QTD_CASOS; i++)
+            {
+                for (int j = 0; j < 2; j++)
+                    valores[i, j] = random.Next(10);
+            }
+        }
+
+
+        void ProcessThread()
+        {
+            threadAtual++;
             // a cada thread iniciada, atualiza a qtd final para que compute diferentes dados
             qtdDeCasosFinal = QTD_CASOS / qtdThreads[presenteIteração] + qtdDeCasosInicial;
+            /*
             Console.WriteLine();
             Console.WriteLine();
             Console.WriteLine("iteração {0}, qtdDeCasosInicial {2}, qtdDeCasosFinal {1}", presenteIteração, qtdDeCasosFinal, qtdDeCasosInicial);
+            */
 
-            for (int i = qtdDeCasosInicial; i < qtdDeCasosFinal; i++)
-            {
-                //aqui irão as funções de resolução do problema;
-                if (actualProblem == "hashmat") ResolveHashmat();
-                Console.WriteLine("oi {0}", i);
-            }
+            //aqui irão as funções de resolução do problema;
+            if (actualProblem == "hashmat") ResolveHashmat();
+
+
 
             // a quantidade inicial deve ser atualizada depois do for e não antes, para que a primeira iteração ocorra com o qtdDeCasosInicial = 0
             qtdDeCasosInicial += QTD_CASOS / qtdThreads[presenteIteração];
@@ -46,6 +63,8 @@ namespace WindowsFormsApp1
 
         private void MainFunction()
         {
+            PopulateInputs();
+
             // Clear existing series data in the chart
             timeComparissonChart.Series.Clear();
 
@@ -67,13 +86,7 @@ namespace WindowsFormsApp1
             timeComparissonChart.ChartAreas[0].AxisY.Title = "Elapsed Time (ms)";
             //timeComparissonChart.ChartAreas[0].AxisY.Maximum = 100;
 
-            // Populate valores array
-            Random random = new Random();
-            for (int i = 0; i < QTD_CASOS; i++)
-            {
-                for (int j = 0; j < 2; j++)
-                    valores[i, j] = random.Next(10);
-            }
+
 
             Stopwatch stopwatch = new Stopwatch();
 
@@ -87,6 +100,13 @@ namespace WindowsFormsApp1
                 presenteIteração = i;
                 qtdDeCasosInicial = 0;
                 qtdDeCasosFinal = 0;
+                threadAtual = 0;
+
+                for (int j = 0; j < qtdThreads[i]; j++)
+                {
+                    threadsExecutaveis[j] = new Thread(ProcessThread);
+                }
+
 
                 stopwatch.Start();
 
@@ -94,7 +114,6 @@ namespace WindowsFormsApp1
                 {
                     //instancia a qtd de threads necessarias para a presente iteração 
                     //se for a primeira, instancia 1 thread, se for a ultima, instancia 16 threads, etc;
-                    threadsExecutaveis[j] = new Thread(Thread);
                     threadsExecutaveis[j].Start();
                 }
 
@@ -109,9 +128,6 @@ namespace WindowsFormsApp1
 
                 stopwatch.Stop();
 
-                foreach (Thread thread in threadsExecutaveis) { thread.Interrupt(); }
-
-
                 TimeSpan elapsedTime = stopwatch.Elapsed;
                 timeSeries.Points.AddXY(qtdThreads[i], elapsedTime.TotalMilliseconds);
             }
@@ -122,8 +138,25 @@ namespace WindowsFormsApp1
         {
             actualProblem = "hashmat";
             MainFunction();
+            foreach (string result in outputResults)
+            {
+                Console.WriteLine(result);
+            }
         }
 
-        private void ResolveHashmat() { }
+        private void ResolveHashmat()
+        {
+            for (int i = qtdDeCasosInicial; i < qtdDeCasosFinal; i++)
+            {
+                if (valores[i, 0] > valores[i, 1])
+                    outputResults.Add($"{i} - THREAD {threadAtual}: Vitória");
+                else if (valores[i, 0] < valores[i, 1])
+                    outputResults.Add($"{i} - THREAD {threadAtual}: Derrota");
+                else
+                    outputResults.Add($"{i} - THREAD {threadAtual}: Empate");
+            }
+        }
+
     }
 }
+
