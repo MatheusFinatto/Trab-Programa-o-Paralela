@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.hashmat = new System.Windows.Forms.Button();
             this.timeComparissonChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.somaFatoriais = new System.Windows.Forms.Button();
@@ -39,7 +39,7 @@
             // 
             // hashmat
             // 
-            this.hashmat.Location = new System.Drawing.Point(39, 42);
+            this.hashmat.Location = new System.Drawing.Point(26, 98);
             this.hashmat.Name = "hashmat";
             this.hashmat.Size = new System.Drawing.Size(75, 23);
             this.hashmat.TabIndex = 0;
@@ -49,29 +49,29 @@
             // 
             // timeComparissonChart
             // 
-            chartArea1.Name = "ChartArea1";
-            this.timeComparissonChart.ChartAreas.Add(chartArea1);
-            legend1.Name = "Legend1";
-            this.timeComparissonChart.Legends.Add(legend1);
+            chartArea2.Name = "ChartArea1";
+            this.timeComparissonChart.ChartAreas.Add(chartArea2);
+            legend2.Name = "Legend1";
+            this.timeComparissonChart.Legends.Add(legend2);
             this.timeComparissonChart.Location = new System.Drawing.Point(26, 138);
             this.timeComparissonChart.Name = "timeComparissonChart";
-            series1.ChartArea = "ChartArea1";
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.timeComparissonChart.Series.Add(series1);
+            series2.ChartArea = "ChartArea1";
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            this.timeComparissonChart.Series.Add(series2);
             this.timeComparissonChart.Size = new System.Drawing.Size(739, 300);
             this.timeComparissonChart.TabIndex = 2;
             this.timeComparissonChart.Text = "Time comparisson";
             // 
             // somaFatoriais
             // 
-            this.somaFatoriais.Location = new System.Drawing.Point(141, 42);
+            this.somaFatoriais.Location = new System.Drawing.Point(107, 98);
             this.somaFatoriais.Name = "somaFatoriais";
             this.somaFatoriais.Size = new System.Drawing.Size(134, 23);
             this.somaFatoriais.TabIndex = 3;
             this.somaFatoriais.Text = "Soma Fatoriais";
             this.somaFatoriais.UseVisualStyleBackColor = true;
-            
+            this.somaFatoriais.Click += new System.EventHandler(this.somaFatoriais_Click);
             // 
             // Form1
             // 

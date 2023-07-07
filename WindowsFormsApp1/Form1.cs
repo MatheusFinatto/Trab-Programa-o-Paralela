@@ -16,28 +16,18 @@ namespace WindowsFormsApp1
 
 
         static readonly int QTD_CASOS = 80;
-        static int[,] valores = new int[QTD_CASOS, 2];
-        static int[] resultados = new int[QTD_CASOS];
+        static long  [,] valores = new long[QTD_CASOS, 2];
         int[] qtdThreads = { 1, 2, 4, 8, 16 };
         static int endThreads = 0;
+
         static string actualProblem = "";
         static int presenteIteração = 0;
         static int qtdDeCasosInicial = 0;
         static int qtdDeCasosFinal = 0;
         static int threadAtual = 0;
+
         static List<string> outputResults = new List<string>(); // Armazena os resultados das threads
-
-
-        void PopulateInputs()
-        {
-            // Populate valores array
-            Random random = new Random();
-            for (int i = 0; i < QTD_CASOS; i++)
-            {
-                for (int j = 0; j < 2; j++)
-                    valores[i, j] = random.Next(10);
-            }
-        }
+        //static int[] resultados = new int[QTD_CASOS];
 
 
         void ProcessThread()
@@ -45,16 +35,10 @@ namespace WindowsFormsApp1
             threadAtual++;
             // a cada thread iniciada, atualiza a qtd final para que compute diferentes dados
             qtdDeCasosFinal = QTD_CASOS / qtdThreads[presenteIteração] + qtdDeCasosInicial;
-            /*
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine("iteração {0}, qtdDeCasosInicial {2}, qtdDeCasosFinal {1}", presenteIteração, qtdDeCasosFinal, qtdDeCasosInicial);
-            */
 
             //aqui irão as funções de resolução do problema;
             if (actualProblem == "hashmat") ResolveHashmat();
-
-
+            if (actualProblem == "fatorial") ResolveFatorial();
 
             // a quantidade inicial deve ser atualizada depois do for e não antes, para que a primeira iteração ocorra com o qtdDeCasosInicial = 0
             qtdDeCasosInicial += QTD_CASOS / qtdThreads[presenteIteração];
@@ -63,8 +47,6 @@ namespace WindowsFormsApp1
 
         private void MainFunction()
         {
-            PopulateInputs();
-
             // Clear existing series data in the chart
             timeComparissonChart.Series.Clear();
 
@@ -85,7 +67,6 @@ namespace WindowsFormsApp1
             timeComparissonChart.ChartAreas[0].AxisX.Title = "Thread Count";
             timeComparissonChart.ChartAreas[0].AxisY.Title = "Elapsed Time (ms)";
             //timeComparissonChart.ChartAreas[0].AxisY.Maximum = 100;
-
 
 
             Stopwatch stopwatch = new Stopwatch();
@@ -136,8 +117,20 @@ namespace WindowsFormsApp1
 
         private void Hashmat_Click(object sender, EventArgs e)
         {
+            outputResults.Clear();
             actualProblem = "hashmat";
+
+            // Populate valores array
+            Random random = new Random();
+            for (int i = 0; i < QTD_CASOS; i++)
+            {
+                for (int j = 0; j < 2; j++)
+                    valores[i, j] = random.Next(10);
+            }
+
             MainFunction();
+
+            //prints on the console
             foreach (string result in outputResults)
             {
                 Console.WriteLine(result);
@@ -157,6 +150,48 @@ namespace WindowsFormsApp1
             }
         }
 
+
+
+        private void somaFatoriais_Click(object sender, EventArgs e)
+        {
+            outputResults.Clear();
+            actualProblem = "fatorial";
+
+            // Populate valores array
+            Random random = new Random();
+            for (int i = 0; i < QTD_CASOS; i++)
+            {
+                for (int j = 0; j < 2; j++)
+                    valores[i, j] = random.Next(25);
+            }
+
+            MainFunction();
+
+            //prints on the console
+            foreach (string result in outputResults)
+            {
+                Console.WriteLine(result);
+            }
+        }
+
+        public static long Factorial(long n)
+        {
+            if (n == 0)
+                return 1;
+
+            return n * Factorial(n - 1);
+        }
+
+        private void ResolveFatorial()
+        {
+
+
+
+            for (int i = qtdDeCasosInicial; i < qtdDeCasosFinal; i++)
+            {
+                Console.WriteLine($"{i} - THREAD {threadAtual}: {Factorial(valores[i, 0]) + Factorial(valores[i, 1])}" );
+            }
+        }
     }
 }
 
