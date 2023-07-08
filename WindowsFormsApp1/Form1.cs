@@ -12,11 +12,12 @@ namespace WindowsFormsApp1
         public Form1()
         {
             InitializeComponent();
+            PopulateCases();
         }
 
 
         static readonly int QTD_CASOS = 80;
-        static long  [,] valores = new long[QTD_CASOS, 2];
+        static int  [,] valores = new int[QTD_CASOS, 2];
         int[] qtdThreads = { 1, 2, 4, 8, 16 };
         static int endThreads = 0;
 
@@ -27,18 +28,41 @@ namespace WindowsFormsApp1
         static int threadAtual = 0;
 
         static List<string> outputResults = new List<string>(); // Armazena os resultados das threads
-        //static int[] resultados = new int[QTD_CASOS];
+        //static long[] resultados = new long[QTD_CASOS];
 
+        //POPULATES THE INPUT ARRAY WITH NUMBERS FROM 0-15
+        private void PopulateCases()
+        {
+            // Populate valores array
+            Random random = new Random();
+            for (long i = 0; i < QTD_CASOS; i++)
+            {
+                for (long j = 0; j < 2; j++)
+                    valores[i, j] = random.Next(15);
+            }
+        }
 
+        private void clickHandlerHelper()
+        {
+            outputResults.Clear();
+            MainFunction();
+            foreach (string result in outputResults)
+            {
+                Console.WriteLine(result);
+            }
+        }
+       
         void ProcessThread()
         {
             threadAtual++;
             // a cada thread iniciada, atualiza a qtd final para que compute diferentes dados
             qtdDeCasosFinal = QTD_CASOS / qtdThreads[presenteIteração] + qtdDeCasosInicial;
 
-            //aqui irão as funções de resolução do problema;
+            if (actualProblem == "soma") ResolveSoma();
             if (actualProblem == "hashmat") ResolveHashmat();
             if (actualProblem == "fatorial") ResolveFatorial();
+            if (actualProblem == "figurinhas") ResolveFigurinhas();
+            if (actualProblem == "A_INCRIVEL_LENDA_DO_INCRIVEL_FLAVIAO_JOSÉ.mp4") ResolveFLAVIAO();
 
             // a quantidade inicial deve ser atualizada depois do for e não antes, para que a primeira iteração ocorra com o qtdDeCasosInicial = 0
             qtdDeCasosInicial += QTD_CASOS / qtdThreads[presenteIteração];
@@ -66,7 +90,8 @@ namespace WindowsFormsApp1
             timeComparissonChart.Titles.Add("Comparison of Elapsed Time");
             timeComparissonChart.ChartAreas[0].AxisX.Title = "Thread Count";
             timeComparissonChart.ChartAreas[0].AxisY.Title = "Elapsed Time (ms)";
-            //timeComparissonChart.ChartAreas[0].AxisY.Maximum = 100;
+            timeComparissonChart.ChartAreas[0].AxisY.Maximum = 500;
+
 
 
             Stopwatch stopwatch = new Stopwatch();
@@ -110,36 +135,20 @@ namespace WindowsFormsApp1
                 stopwatch.Stop();
 
                 TimeSpan elapsedTime = stopwatch.Elapsed;
-                timeSeries.Points.AddXY(qtdThreads[i], elapsedTime.TotalMilliseconds);
+                timeSeries.Points.AddXY(qtdThreads[i], elapsedTime.TotalMilliseconds); 
             }
         }
 
 
         private void Hashmat_Click(object sender, EventArgs e)
         {
-            outputResults.Clear();
             actualProblem = "hashmat";
-
-            // Populate valores array
-            Random random = new Random();
-            for (int i = 0; i < QTD_CASOS; i++)
-            {
-                for (int j = 0; j < 2; j++)
-                    valores[i, j] = random.Next(10);
-            }
-
-            MainFunction();
-
-            //prints on the console
-            foreach (string result in outputResults)
-            {
-                Console.WriteLine(result);
-            }
+            clickHandlerHelper();
         }
 
         private void ResolveHashmat()
         {
-            for (int i = qtdDeCasosInicial; i < qtdDeCasosFinal; i++)
+            for (long i = qtdDeCasosInicial; i < qtdDeCasosFinal; i++)
             {
                 if (valores[i, 0] > valores[i, 1])
                     outputResults.Add($"{i} - THREAD {threadAtual}: Vitória");
@@ -154,24 +163,8 @@ namespace WindowsFormsApp1
 
         private void somaFatoriais_Click(object sender, EventArgs e)
         {
-            outputResults.Clear();
             actualProblem = "fatorial";
-
-            // Populate valores array
-            Random random = new Random();
-            for (int i = 0; i < QTD_CASOS; i++)
-            {
-                for (int j = 0; j < 2; j++)
-                    valores[i, j] = random.Next(25);
-            }
-
-            MainFunction();
-
-            //prints on the console
-            foreach (string result in outputResults)
-            {
-                Console.WriteLine(result);
-            }
+            clickHandlerHelper();
         }
 
         public static long Factorial(long n)
@@ -184,14 +177,79 @@ namespace WindowsFormsApp1
 
         private void ResolveFatorial()
         {
-
-
-
-            for (int i = qtdDeCasosInicial; i < qtdDeCasosFinal; i++)
+            for (long i = qtdDeCasosInicial; i < qtdDeCasosFinal; i++)
             {
                 Console.WriteLine($"{i} - THREAD {threadAtual}: {Factorial(valores[i, 0]) + Factorial(valores[i, 1])}" );
             }
         }
+
+        private void Figurinhas_Click(object sender, EventArgs e)
+        {
+            actualProblem = "figurinhas";
+            clickHandlerHelper();
+        }
+
+        private long MaximoDaPilha(long m, long n)
+        {
+            if (n == 0)
+            {
+                return m;
+            }
+            return MaximoDaPilha(n, m % n);
+        }
+
+        private void ResolveFigurinhas()
+        {
+            for (long i = qtdDeCasosInicial; i < qtdDeCasosFinal; i++)
+            {
+                Console.WriteLine($"{i} - THREAD {threadAtual}: {MaximoDaPilha(valores[i, 0], valores[i, 1])}");
+            }
+        }
+
+        private void Soma_Click(object sender, EventArgs e)
+        {
+            actualProblem = "soma";
+            clickHandlerHelper();
+        }
+
+        private void ResolveSoma()
+        {
+            for (long i = qtdDeCasosInicial; i < qtdDeCasosFinal; i++)
+            {
+                Console.WriteLine($"{i} - THREAD {threadAtual}: {Soma(valores[i, 0], valores[i, 1])}");
+            }
+        }
+
+        private long Soma(long m, long n)
+        {
+            return m + n;
+        }
+
+        private void ALendaDeFlaviusJosephusFodase_Click(object sender, EventArgs e)
+        {
+            //sim, sou doente.
+            actualProblem = "A_INCRIVEL_LENDA_DO_INCRIVEL_FLAVIAO_JOSÉ.mp4";
+            clickHandlerHelper();
+        }
+
+        private void ResolveFLAVIAO()
+        {
+            for (long i = qtdDeCasosInicial; i < qtdDeCasosFinal; i++)
+            {
+                Console.WriteLine($"{i} - THREAD {threadAtual}: {FlaviusJosephus(valores[i, 0], valores[i, 1])}");
+            }
+        }
+
+        int FlaviusJosephus(int n, int k)
+        {
+            int result = 0;
+            for (int i = 2; i <= n; i++)
+            {
+                result = (result + k) % i;
+            }
+            return result;
+        }
+
     }
 }
 
