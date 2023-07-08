@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 
@@ -46,71 +41,65 @@ namespace WindowsFormsApp1
         public Form1()
         {
             InitializeComponent();
+            PopulateCases();
         }
 
-        private void hashmat_Click(object sender, EventArgs e)
+
+        static readonly int QTD_CASOS = 80;
+        static int  [,] valores = new int[QTD_CASOS, 2];
+        int[] qtdThreads = { 1, 2, 4, 8, 16 };
+        static int endThreads = 0;
+
+        static string actualProblem = "";
+        static int presenteIteração = 0;
+        static int qtdDeCasosInicial = 0;
+        static int qtdDeCasosFinal = 0;
+        static int threadAtual = 0;
+
+        static List<string> outputResults = new List<string>(); // Armazena os resultados das threads
+        //static long[] resultados = new long[QTD_CASOS];
+
+        //POPULATES THE INPUT ARRAY WITH NUMBERS FROM 0-15
+        private void PopulateCases()
         {
-            // Define the list of cases
-            List<string> cases = new List<string>
+            // Populate valores array
+            Random random = new Random();
+            for (long i = 0; i < QTD_CASOS; i++)
             {
-                "10 12",
-                "10 14",
-                "100 200",
-                "50 60",
-                "30 20",
-                "80 90",
-                "15 25",
-                "70 50",
-                "40 35",
-                "55 65",
-                "95 85",
-                "120 110",
-                "180 190",
-                "230 220",
-                "500 510",
-                "240 250",
-                "350 340",
-                "430 440",
-                "660 670",
-                "890 880",
-                "950 960",
-                "770 780",
-                "880 870",
-                "1100 1110",
-                "1050 1040",
-                "1230 1240",
-                "1350 1360",
-                "1450 1440",
-                "1660 1670",
-                "1780 1770",
-                "1900 1910",
-                "2000 2010",
-                "2100 2090",
-                "2350 2340",
-                "2490 2480",
-                "2530 2520",
-                "2670 2680",
-                "2750 2760",
-                "2800 2810",
-                "3000 3010",
-                "3100 3110",
-                "3250 3240",
-                "3300 3290",
-                "3450 3460",
-                "3510 3520",
-                "3620 3630",
-                "3700 3710",
-                "3850 3840",
-                "3910 3920",
-                "4000 4010",
-                "4100 4110",
-                "4250 4260",
-                "4370 4360"
-            };
+                for (long j = 0; j < 2; j++)
+                    valores[i, j] = random.Next(15);
+            }
+        }
 
-            // Define the number of threads to test
-            int[] threadCounts = { 1, 2, 4, 8, 16 };
+        private void clickHandlerHelper()
+        {
+            outputResults.Clear();
+            MainFunction();
+            foreach (string result in outputResults)
+            {
+                Console.WriteLine(result);
+            }
+        }
+       
+        void ProcessThread()
+        {
+            threadAtual++;
+            // a cada thread iniciada, atualiza a qtd final para que compute diferentes dados
+            qtdDeCasosFinal = QTD_CASOS / qtdThreads[presenteIteração] + qtdDeCasosInicial;
 
+            if (actualProblem == "soma") ResolveSoma();
+            if (actualProblem == "hashmat") ResolveHashmat();
+            if (actualProblem == "fatorial") ResolveFatorial();
+            if (actualProblem == "figurinhas") ResolveFigurinhas();
+            if (actualProblem == "A_INCRIVEL_LENDA_DO_INCRIVEL_FLAVIAO_JOSÉ.mp4") ResolveFLAVIAO();
+
+            // a quantidade inicial deve ser atualizada depois do for e não antes, para que a primeira iteração ocorra com o qtdDeCasosInicial = 0
+            qtdDeCasosInicial += QTD_CASOS / qtdThreads[presenteIteração];
+            endThreads++;
+        }
+
+        private void MainFunction()
+        {
             // Clear existing series data in the chart
             timeComparissonChart.Series.Clear();
 
@@ -130,40 +119,165 @@ namespace WindowsFormsApp1
             timeComparissonChart.Titles.Add("Comparison of Elapsed Time");
             timeComparissonChart.ChartAreas[0].AxisX.Title = "Thread Count";
             timeComparissonChart.ChartAreas[0].AxisY.Title = "Elapsed Time (ms)";
-            timeComparissonChart.ChartAreas[0].AxisY.Maximum = 0.05;
+            timeComparissonChart.ChartAreas[0].AxisY.Maximum = 500;
 
-            // Process each number of threads
-            foreach (int threadCount in threadCounts)
+            Stopwatch stopwatch = new Stopwatch();
+
+
+            //inicia o loop principal (numero de testes feitos)
+            for (int i = 0; i < qtdThreads.Length; i++)
             {
-                // Create a Stopwatch for each iteration
-                Stopwatch stopwatch = new Stopwatch();
 
-                // Start the stopwatch
-                stopwatch.Start();
+                //cria um array de threads que irá receber as instâncias
+                Thread[] threadsExecutaveis = new Thread[qtdThreads[i]];
+                endThreads = 0;
+                presenteIteração = i;
+                qtdDeCasosInicial = 0;
+                qtdDeCasosFinal = 0;
+                threadAtual = 0;
 
-                // Process each case using the specified number of threads
-                foreach (string caseString in cases)
+                for (int j = 0; j < qtdThreads[i]; j++)
                 {
-                    // Split the case into two numbers
-                    string[] numbers = caseString.Split(' ');
-
-                    // Parse the numbers
-                    int hashmatSoldiers = int.Parse(numbers[0]);
-                    int opponentSoldiers = int.Parse(numbers[1]);
-
-                    // Calculate the difference
-                    int difference = Math.Abs(hashmatSoldiers - opponentSoldiers);
+                    threadsExecutaveis[j] = new Thread(ProcessThread);
                 }
 
-                // Stop the stopwatch
+
+                stopwatch.Start();
+
+                for (int j = 0; j < qtdThreads[i]; j++)
+                {
+                    //instancia a qtd de threads necessarias para a presente iteração 
+                    //se for a primeira, instancia 1 thread, se for a ultima, instancia 16 threads, etc;
+                    threadsExecutaveis[j].Start();
+                }
+
+
+                while (true)
+                {
+                    if (endThreads >= qtdThreads[i])
+                    {
+                        break;
+                    }
+                }
+
                 stopwatch.Stop();
 
-                // Get the elapsed time
                 TimeSpan elapsedTime = stopwatch.Elapsed;
-
-                // Add a data point to the series with the thread count and elapsed time
-                timeSeries.Points.AddXY(threadCount, elapsedTime.TotalMilliseconds);
+                timeSeries.Points.AddXY(qtdThreads[i], elapsedTime.TotalMilliseconds); 
             }
         }
+
+
+        private void Hashmat_Click(object sender, EventArgs e)
+        {
+            actualProblem = "hashmat";
+            clickHandlerHelper();
+        }
+
+        private void ResolveHashmat()
+        {
+            for (long i = qtdDeCasosInicial; i < qtdDeCasosFinal; i++)
+            {
+                if (valores[i, 0] > valores[i, 1])
+                    outputResults.Add($"{i} - THREAD {threadAtual}: Vitória");
+                else if (valores[i, 0] < valores[i, 1])
+                    outputResults.Add($"{i} - THREAD {threadAtual}: Derrota");
+                else
+                    outputResults.Add($"{i} - THREAD {threadAtual}: Empate");
+            }
+        }
+
+
+
+        private void somaFatoriais_Click(object sender, EventArgs e)
+        {
+            actualProblem = "fatorial";
+            clickHandlerHelper();
+        }
+
+        public static long Factorial(long n)
+        {
+            if (n == 0)
+                return 1;
+
+            return n * Factorial(n - 1);
+        }
+
+        private void ResolveFatorial()
+        {
+            for (long i = qtdDeCasosInicial; i < qtdDeCasosFinal; i++)
+            {
+                Console.WriteLine($"{i} - THREAD {threadAtual}: {Factorial(valores[i, 0]) + Factorial(valores[i, 1])}" );
+            }
+        }
+
+        private void Figurinhas_Click(object sender, EventArgs e)
+        {
+            actualProblem = "figurinhas";
+            clickHandlerHelper();
+        }
+
+        private long MaximoDaPilha(long m, long n)
+        {
+            if (n == 0)
+            {
+                return m;
+            }
+            return MaximoDaPilha(n, m % n);
+        }
+
+        private void ResolveFigurinhas()
+        {
+            for (long i = qtdDeCasosInicial; i < qtdDeCasosFinal; i++)
+            {
+                Console.WriteLine($"{i} - THREAD {threadAtual}: {MaximoDaPilha(valores[i, 0], valores[i, 1])}");
+            }
+        }
+
+        private void Soma_Click(object sender, EventArgs e)
+        {
+            actualProblem = "soma";
+            clickHandlerHelper();
+        }
+
+        private void ResolveSoma()
+        {
+            for (long i = qtdDeCasosInicial; i < qtdDeCasosFinal; i++)
+            {
+                Console.WriteLine($"{i} - THREAD {threadAtual}: {Soma(valores[i, 0], valores[i, 1])}");
+            }
+        }
+
+        private long Soma(long m, long n)
+        {
+            return m + n;
+        }
+
+        private void ALendaDeFlaviusJosephusFodase_Click(object sender, EventArgs e)
+        {
+            //sim, sou doente.
+            actualProblem = "A_INCRIVEL_LENDA_DO_INCRIVEL_FLAVIAO_JOSÉ.mp4";
+            clickHandlerHelper();
+        }
+
+        private void ResolveFLAVIAO()
+        {
+            for (long i = qtdDeCasosInicial; i < qtdDeCasosFinal; i++)
+            {
+                Console.WriteLine($"{i} - THREAD {threadAtual}: {FlaviusJosephus(valores[i, 0], valores[i, 1])}");
+            }
+        }
+
+        int FlaviusJosephus(int n, int k)
+        {
+            int result = 0;
+            for (int i = 2; i <= n; i++)
+            {
+                result = (result + k) % i;
+            }
+            return result;
+        }
+
     }
-    }
+}
+
